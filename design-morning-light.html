@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Design Morning">
+<title>Design Morning</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #f7f5f1;
+    --surface:   #ffffff;
+    --surface2:  #f0ede8;
+    --border:    #e8e2d8;
+    --border2:   #d8d0c4;
+    --ink:       #2a2520;
+    --ink2:      #6b6258;
+    --ink3:      #a89f94;
+    --green:     #3a6b52;
+    --green-bg:  #eaf2ec;
+    --warm:      #8b5e3c;
+    --warm-bg:   #f5ede5;
+    --blue:      #3a5a7a;
+    --blue-bg:   #e8eef5;
+    --purple:    #5a4a7a;
+    --purple-bg: #eeebf5;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* ── Top bar ── */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-icon {
+    width: 32px; height: 32px;
+    background: var(--ink);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: 'Lora', serif;
+    font-size: 15px;
+    font-style: italic;
+    flex-shrink: 0;
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .brand-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: 0.3px;
+  }
+
+  .brand-date {
+    font-size: 10px;
+    color: var(--ink3);
+    letter-spacing: 0.5px;
+  }
+
+  .refresh-btn {
+    background: var(--green);
+    color: #fff;
+    border: none;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    font-size: 17px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.1s;
+    flex-shrink: 0;
+  }
+
+  .refresh-btn:active { transform: scale(0.93); }
+  .refresh-btn.spinning { animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Category tabs ── */
+  .cat-scroll {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .cat-scroll::-webkit-scrollbar { display: none; }
+
+  .cat-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 10px 16px;
+    width: max-content;
+  }
+
+  .cat-tab {
+    background: none;
+    border: 1.5px solid var(--border);
+    color: var(--ink2);
+    padding: 6px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+
+  .cat-tab:active { transform: scale(0.96); }
+
+  .cat-tab.active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+    font-weight: 500;
+  }
+
+  /* ── Status bar ── */
+  .status-bar {
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--ink3);
+  }
+
+  .live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--green-bg);
+    color: var(--green);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  .live-dot {
+    width: 5px; height: 5px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── Section header ── */
+  .section-header {
+    padding: 16px 20px 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 4px;
+  }
+
+  .section-tag.arch   { background: var(--green-bg);  color: var(--green); }
+  .section-tag.int    { background: var(--blue-bg);   color: var(--blue); }
+  .section-tag.furn   { background: var(--warm-bg);   color: var(--warm); }
+  .section-tag.life   { background: var(--purple-bg); color: var(--purple); }
+  .section-tag.indie  { background: var(--surface2);  color: var(--ink2); }
+
+  .section-count {
+    font-size: 11px;
+    color: var(--ink3);
+    margin-left: auto;
+  }
+
+  /* ── Card list ── */
+  .card-list {
+    padding: 0 16px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* ── Article card ── */
+  .article-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: box-shadow 0.2s, transform 0.15s;
+    animation: slideUp 0.35s ease both;
+  }
+
+  .article-card:active {
+    transform: scale(0.985);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Featured card (with image) */
+  .article-card.has-thumb .card-thumb {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+    background: var(--surface2);
+  }
+
+  .card-body {
+    padding: 14px 16px 16px;
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .card-source {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .card-source-dot {
+    width: 4px; height: 4px;
+    background: currentColor;
+    border-radius: 50%;
+  }
+
+  .card-time {
+    font-size: 10px;
+    color: var(--ink3);
+  }
+
+  .card-title {
+    font-family: 'Lora', serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.45;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: -0.1px;
+  }
+
+  .card-desc {
+    font-size: 12.5px;
+    color: var(--ink2);
+    line-height: 1.65;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-footer {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .card-cat {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 10px;
+    background: var(--surface2);
+    color: var(--ink2);
+  }
+
+  .card-arrow {
+    font-size: 14px;
+    color: var(--ink3);
+  }
+
+  /* ── Skeleton loading ── */
+  .skeleton-list {
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .skel-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+
+  @keyframes shimmer { 0%,100%{opacity:1} 50%{opacity:0.45} }
+
+  .skel-line {
+    height: 10px;
+    background: var(--surface2);
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
+  .skel-line.w30 { width: 30%; }
+  .skel-line.w60 { width: 60%; }
+  .skel-line.w80 { width: 80%; }
+  .skel-line.w100 { width: 100%; }
+  .skel-line.h14 { height: 14px; }
+  .skel-img { height: 160px; background: var(--surface2); border-radius: 8px; margin-bottom: 14px; }
+
+  /* ── Empty / Error ── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 32px;
+    color: var(--ink3);
+  }
+
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-text { font-size: 14px; line-height: 1.7; }
+
+  /* ── Bottom padding for safe area ── */
+  .bottom-pad { height: 32px; }
+
+  /* ── Separator ── */
+  .sep { height: 1px; background: var(--border); margin: 8px 20px; }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-icon">D</div>
+    <div class="brand-text">
+      <div class="brand-name">Design Morning</div>
+      <div class="brand-date" id="brand-date">建筑与设计每日资讯</div>
+    </div>
+  </div>
+  <button class="refresh-btn" id="refresh-btn" onclick="loadFeeds()" title="刷新">↻</button>
+</div>
+
+<!-- Category tabs -->
+<div class="cat-scroll">
+  <div class="cat-tabs">
+    <button class="cat-tab active" onclick="filterCat('all', this)">全部</button>
+    <button class="cat-tab" onclick="filterCat('建筑', this)">建筑</button>
+    <button class="cat-tab" onclick="filterCat('室内', this)">室内空间</button>
+    <button class="cat-tab" onclick="filterCat('家具', this)">家具产品</button>
+    <button class="cat-tab" onclick="filterCat('生活方式', this)">生活方式</button>
+    <button class="cat-tab" onclick="filterCat('独立媒体', this)">独立媒体</button>
+  </div>
+</div>
+
+<!-- Status -->
+<div class="status-bar">
+  <span id="status-text">正在加载…</span>
+  <span class="live-pill"><div class="live-dot"></div>Live</span>
+</div>
+
+<!-- Feed content -->
+<div id="feed"></div>
+
+<div class="bottom-pad"></div>
+
+<script>
+const FEEDS = [
+  { name:'ArchDaily',            url:'https://feeds.feedburner.com/Archdaily',               cat:'建筑',    tag:'arch' },
+  { name:'Dezeen',               url:'https://www.dezeen.com/feed/',                          cat:'建筑',    tag:'arch' },
+  { name:'The Arch Review',      url:'https://www.architectural-review.com/rss',              cat:'建筑',    tag:'arch' },
+  { name:'Habitus Living',       url:'https://www.habitusliving.com/feed/',                   cat:'建筑',    tag:'arch' },
+  { name:'The Local Project',    url:'https://www.thelocalproject.com.au/feed/',              cat:'建筑',    tag:'arch' },
+  { name:'Knstrct',              url:'https://knstrct.com/feed/',                             cat:'建筑',    tag:'arch' },
+  { name:'Interior Design Mag',  url:'https://www.interiordesign.net/rss/content.rss',        cat:'室内',    tag:'int'  },
+  { name:'Yellowtrace',          url:'https://www.yellowtrace.com.au/feed/',                  cat:'室内',    tag:'int'  },
+  { name:'FRAME Magazine',       url:'https://www.frameweb.com/rss.xml',                      cat:'室内',    tag:'int'  },
+  { name:'Est Living',           url:'https://www.estliving.com/feed/',                       cat:'室内',    tag:'int'  },
+  { name:'Arch Digest',          url:'https://www.architecturaldigest.com/feed/rss',          cat:'室内',    tag:'int'  },
+  { name:'Design Milk',          url:'https://design-milk.com/feed/',                         cat:'家具',    tag:'furn' },
+  { name:'Sight Unseen',         url:'https://www.sightunseenmag.com/feed/',                  cat:'家具',    tag:'furn' },
+  { name:'Wallpaper*',           url:'https://www.wallpaper.com/rss',                         cat:'生活方式', tag:'life' },
+  { name:'Monocle',              url:'https://monocle.com/feed/radio/the-monocle-daily/',     cat:'生活方式', tag:'life' },
+  { name:'Remodelista',          url:'https://www.remodelista.com/feed/',                     cat:'生活方式', tag:'life' },
+  { name:'Kinfolk',              url:'https://www.kinfolk.com/feed/',                         cat:'生活方式', tag:'life' },
+  { name:'Ignant',               url:'https://www.ignant.com/feed/',                          cat:'独立媒体', tag:'indie'},
+  { name:'Pin–Up Magazine',      url:'https://www.pinupmagazine.org/feed',                    cat:'独立媒体', tag:'indie'},
+  { name:'Nowness',              url:'https://www.nowness.com/rss',                           cat:'独立媒体', tag:'indie'},
+];
+
+const API = 'https://api.rss2json.com/v1/api.json?rss_url=';
+let allArticles = [];
+let activeCat = 'all';
+
+// Date
+const now = new Date();
+document.getElementById('brand-date').textContent =
+  now.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'short' });
+
+function timeAgo(str) {
+  const diff = Math.floor((Date.now() - new Date(str)) / 60000);
+  if (!diff || isNaN(diff)) return '';
+  if (diff < 60) return `${diff}m`;
+  if (diff < 1440) return `${Math.floor(diff/60)}h`;
+  return `${Math.floor(diff/1440)}d`;
+}
+
+function stripHtml(h) {
+  const d = document.createElement('div');
+  d.innerHTML = h;
+  return (d.textContent || '').replace(/\s+/g,' ').trim();
+}
+
+function renderSkeletons() {
+  document.getElementById('feed').innerHTML = `
+    <div class="skeleton-list">
+      ${Array(5).fill(0).map(() => `
+        <div class="skel-card">
+          <div class="skel-img"></div>
+          <div class="skel-line w30"></div>
+          <div class="skel-line h14 w80"></div>
+          <div class="skel-line w100"></div>
+          <div class="skel-line w60"></div>
+        </div>`).join('')}
+    </div>`;
+}
+
+async function fetchOne(feed) {
+  try {
+    const r = await fetch(`${API}${encodeURIComponent(feed.url)}&count=6`);
+    const d = await r.json();
+    if (d.status !== 'ok') return [];
+    return (d.items||[]).slice(0,6).map(item => ({
+      source: feed.name,
+      cat:    feed.cat,
+      tag:    feed.tag,
+      title:  item.title || '',
+      link:   item.link  || '#',
+      desc:   stripHtml(item.description || item.content || '').slice(0, 200),
+      thumb:  item.thumbnail || item.enclosure?.link || '',
+      date:   item.pubDate || '',
+    }));
+  } catch { return []; }
+}
+
+function cardHtml(a, i) {
+  const hasThumb = a.thumb && a.thumb.startsWith('http');
+  const ago = timeAgo(a.date);
+  return `
+    <a href="${a.link}" target="_blank" class="article-card${hasThumb ? ' has-thumb' : ''}"
+       style="animation-delay:${i * 0.04}s">
+      ${hasThumb ? `<img class="card-thumb" src="${a.thumb}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
+      <div class="card-body">
+        <div class="card-top">
+          <div class="card-source"><div class="card-source-dot"></div>${a.source}</div>
+          ${ago ? `<div class="card-time">${ago}</div>` : ''}
+        </div>
+        <div class="card-title">${a.title}</div>
+        ${a.desc ? `<div class="card-desc">${a.desc}</div>` : ''}
+        <div class="card-footer">
+          <span class="card-cat">${a.cat}</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </div>
+    </a>`;
+}
+
+const CAT_LABELS = {
+  arch:  { label:'建筑',    cls:'arch'  },
+  int:   { label:'室内空间', cls:'int'   },
+  furn:  { label:'家具产品', cls:'furn'  },
+  life:  { label:'生活方式', cls:'life'  },
+  indie: { label:'独立媒体', cls:'indie' },
+};
+
+function renderFeed(articles) {
+  const feed = document.getElementById('feed');
+  const filtered = activeCat === 'all'
+    ? articles
+    : articles.filter(a => a.cat === activeCat);
+
+  if (!filtered.length) {
+    feed.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">暂无内容<br>请点击右上角刷新</div></div>`;
+    return;
+  }
+
+  // Group by tag
+  const groups = {};
+  filtered.forEach(a => {
+    if (!groups[a.tag]) groups[a.tag] = [];
+    groups[a.tag].push(a);
+  });
+
+  let html = '';
+  const tagOrder = ['arch','int','furn','life','indie'];
+  tagOrder.forEach(tag => {
+    const items = groups[tag];
+    if (!items || !items.length) return;
+    const meta = CAT_LABELS[tag] || { label: tag, cls: 'indie' };
+    html += `
+      <div class="section-header">
+        <span class="section-tag ${meta.cls}">${meta.label}</span>
+        <span class="section-count">${items.length} 篇</span>
+      </div>
+      <div class="card-list">
+        ${items.map((a, i) => cardHtml(a, i)).join('')}
+      </div>
+      <div class="sep"></div>`;
+  });
+
+  feed.innerHTML = html;
+
+  // Update status
+  const total = filtered.length;
+  const srcs = [...new Set(filtered.map(a => a.source))].length;
+  const t = now.toLocaleTimeString('zh-CN', { hour:'2-digit', minute:'2-digit' });
+  document.getElementById('status-text').textContent = `${total} 篇 · ${srcs} 个来源 · ${t} 更新`;
+}
+
+async function loadFeeds() {
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('spinning');
+  btn.style.pointerEvents = 'none';
+  renderSkeletons();
+
+  const results = await Promise.allSettled(FEEDS.map(fetchOne));
+  allArticles = results
+    .filter(r => r.status === 'fulfilled')
+    .flatMap(r => r.value)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  renderFeed(allArticles);
+  btn.classList.remove('spinning');
+  btn.style.pointerEvents = '';
+}
+
+function filterCat(cat, btn) {
+  activeCat = cat;
+  document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFeed(allArticles);
+}
+
+loadFeeds();
+</script>
+</body>
+</html>
